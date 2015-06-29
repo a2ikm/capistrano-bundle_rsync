@@ -25,7 +25,11 @@ class Capistrano::BundleRsync::Git < Capistrano::BundleRsync::SCM
     execute "mkdir -p #{config.local_release_path}"
 
     within config.local_mirror_path do
-      if tree = fetch(:repo_tree)
+      if tree = fetch(:deploy_subdir)
+        stripped = tree.slice %r#^/?(.*?)/?$#, 1 # strip both side /
+        num_components = stripped.count('/') + 1
+        execute :git, :archive, fetch(:branch), tree, "| tar -x --strip-components #{num_components} -f - -C ", "#{config.local_release_path}"
+      elsif tree = fetch(:repo_tree)
         stripped = tree.slice %r#^/?(.*?)/?$#, 1 # strip both side /
         num_components = stripped.count('/')
         execute :git, :archive, fetch(:branch), tree, "| tar -x --strip-components #{num_components} -f - -C ", "#{config.local_release_path}"

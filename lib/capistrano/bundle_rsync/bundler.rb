@@ -1,5 +1,6 @@
 require 'capistrano/bundle_rsync/base'
 require 'capistrano/configuration/filter'
+require 'bundler'
 
 class Capistrano::BundleRsync::Bundler < Capistrano::BundleRsync::Base
   def install
@@ -38,8 +39,8 @@ BUNDLE_BIN: #{release_path.join('bin')}
     end
 
     # Do not remove if :bundle_rsync_local_release_path is directly specified
-    # because releases/#{datetime} directories are not created in such case. 
-    # Note that :bundle_rsync_local_release_path is automatically set when `local_git` scm is used. 
+    # because releases/#{datetime} directories are not created in such case.
+    # Note that :bundle_rsync_local_release_path is automatically set when `local_git` scm is used.
     unless fetch(:bundle_rsync_local_release_path)
       releases = capture(:ls, '-x', config.local_releases_path).split
       if releases.count >= config.keep_releases

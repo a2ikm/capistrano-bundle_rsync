@@ -8,33 +8,39 @@ class Capistrano::BundleRsync::Git < Capistrano::BundleRsync::SCM
   end
 
   def clone
-    if File.exist?("#{config.local_mirror_path}/HEAD")
+    if File.exist?(config.local_mirror_path)
       info t(:mirror_exists, at: config.local_mirror_path)
     else
-      execute :git, :clone, '--mirror', repo_url, config.local_mirror_path
+      execute :git, :clone, '--recursive', repo_url, config.local_mirror_path
     end
   end
 
   def update
     within config.local_mirror_path do
       execute :git, :remote, :update
+      execute :git, :checkout, fetch(:branch)
+      execute :git, :pull
+      execute :git, :submodule, :update, '--init'
     end
   end
 
   def create_release
     execute "mkdir -p #{config.local_release_path}"
 
-    strip_repo_tree = fetch(:strip_repo_tree, false)
+    if repo_tree = fetch(:repo_tree)
+      repo_tree = repo_tree.slice %r#^/?(.*?)/?$#,  1 # strip both side /
 
-    within config.local_mirror_path do
-      if tree = fetch(:repo_tree)
-        stripped = tree.slice %r#^/?(.*?)/?$#, 1 # strip both side /
-        num_components = stripped.count('/') + (strip_repo_tree ? 1 : 0)
-        execute :git, :archive, fetch(:branch), tree, "| tar -x --strip-components #{num_components} -f - -C ", "#{config.local_release_path}"
+      if strip_repo_tree = fetch(:strip_repo_tree, false)
+        build_from = File.join(config.local_mirror_path, repo_tree, "")
       else
-        execute :git, :archive, fetch(:branch), '| tar -x -C', "#{config.local_release_path}"
-      end      
+        build_from = File.join(config.local_mirror_path, repo_tree)
+      end
+    else
+      build_from = File.join(config.local_mirror_path, "")
     end
+
+    cmd = [:rsync, '-al', build_from, config.local_release_path].flatten
+    execute *cmd
   end
 
   def rsync_release

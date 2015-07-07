@@ -43,7 +43,9 @@ class Capistrano::BundleRsync::Git < Capistrano::BundleRsync::SCM
       build_from = File.join(config.local_mirror_path, "")
     end
 
-    cmd = [:rsync, '-al', build_from, config.local_release_path].flatten
+    excludes = fetch(:excludes, []).push('.git').uniq.flat_map { |e| ['--exclude', e] }
+
+    cmd = [:rsync, '-al', excludes, build_from, config.local_release_path].flatten
     execute *cmd
   end
 

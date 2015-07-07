@@ -67,6 +67,7 @@ bundle_rsync_config_files | `nil` | Additional files to rsync. Specified files a
 bundle_rsync_shared_dirs | `nil` | Additional directories to rsync. Specified directories are copied into `shared` directory.
 bundle_rsync_skip_bundle | false | (Secret option) Do not `bundle` and rsync bundle.
 git_clone_depth | `nil` | git-clone(1)'s `--depth` option
+excludes | `[]` | `--exclude` option for tar(1)
 
 ## Task Orders
 

@@ -4,7 +4,7 @@ Deploy an application and bundled gems via rsync
 
 ## What is this for?
 
-Capistrano::BundleRsync builds (bundle) gems only once on a deploy machine and transfers gems to your production machines via rsync, which saves you from building gems on each your production machine. 
+Capistrano::BundleRsync builds (bundle) gems only once on a deploy machine and transfers gems to your production machines via rsync, which saves you from building gems on each your production machine.
 
 Also saves you from having to install Git and Build Tools on your production machine.
 
@@ -15,13 +15,13 @@ Capistrano::BundleRsync works as followings:
 1. Do `git clone --mirror URL .local_repo/mirror` on a deploy (local) machine.
 2. Extract a branch by `git archive {branch}` to `.local_repo/releases/{datetime}`
 3. Do `bundle --without development test --path .local_repo/bundle` on a deploy (local) machine.
-4. Deploy the `release` directory to remote machines by `rsync`. 
+4. Deploy the `release` directory to remote machines by `rsync`.
 5. Deploy the `bundle` directory to remote machines by `rsync`.
 
 ## Prerequisites
 
 The deploy machine and remote machines must be on same architectures (i386, x86\_64) because
-C exntension gems are built on the deploy machine and transfered by rsync. 
+C exntension gems are built on the deploy machine and transfered by rsync.
 
 Requiremens on remote machines:
 
@@ -37,7 +37,7 @@ Requirements on a deploy machine:
 5. The same ruby used at your remote machines
 6. A ssh key to login to your remote machines via ssh (Passowrd authentication is not supported)
 
-Notice that it is not required to have Git and Build Tools on each remote machine. 
+Notice that it is not required to have Git and Build Tools on each remote machine.
 
 ## Configuration
 
@@ -45,7 +45,7 @@ Set Capistrano variables with `set name, value`.
 
 Name          | Default | Description
 --------------|---------|------------
-repo_url      | `.` | The path or URL to a Git repository to clone from.  
+repo_url      | `.` | The path or URL to a Git repository to clone from.
 repo_tree      | nil | Specify the subtree path of the repository to deploy.
 strip_repo_tree | false   | Strip  repo_tree's head directory or not.
 branch        | `master` | The Git branch to checkout.
@@ -56,7 +56,7 @@ bundle_rsync_scm | `git` | SCM Strategy inside `bundle_rsync`. `git` uses git. `
 bundle_rsync_local_base_path   | `$(pwd)/.local_repo` | The base directory to clone repository
 bundle_rsync_local_mirror_path | `#{base_path}/mirror"` | Path where to mirror your repository
 bundle_rsync_local_releases_path | `"#{base_path}/releases"` | Path of the directory to checkout your repository
-bundle_rsync_local_release_path | `"#{releases_path}/#{datetime}"` | Path to checkout your repository (releases_path + release_name). If you specify this, `keep_releases` for local releases path is disabled because `datetime` directories are no longer created. This parameter is set as `repo_url` in the case of `local_git` as default. 
+bundle_rsync_local_release_path | `"#{releases_path}/#{datetime}"` | Path to checkout your repository (releases_path + release_name). If you specify this, `keep_releases` for local releases path is disabled because `datetime` directories are no longer created. This parameter is set as `repo_url` in the case of `local_git` as default.
 bundle_rsync_local_bundle_path | `"#{base_path}/bundle"` | Path where to bundle install gems.
 bundle_rsync_ssh_options | `ssh_options` | Configuration of ssh for rsync. Default uses the value of `ssh_options`
 bundle_rsync_keep_releases | `keep_releases` | The number of releases to keep on .local_repo
@@ -66,6 +66,7 @@ bundle_rsync_rsync_options | `-az --delete` | Configuration of rsync options.
 bundle_rsync_config_files | `nil` | Additional files to rsync. Specified files are copied into `config` directory.
 bundle_rsync_shared_dirs | `nil` | Additional directories to rsync. Specified directories are copied into `shared` directory.
 bundle_rsync_skip_bundle | false | (Secret option) Do not `bundle` and rsync bundle.
+git_clone_depth | `nil` | git-clone(1)'s `--depth` option
 
 ## Task Orders
 
@@ -106,7 +107,7 @@ gem 'capistrano-rbenv'
 gem 'capistrano-bundle_rsync'
 ```
 
-Run `bundle exec cap install`. 
+Run `bundle exec cap install`.
 
 ```bash
 $ bundle
@@ -192,7 +193,7 @@ task :precompile do
         execute :bundle, 'exec rake assets:precompile'
       end
     end
-    
+
     hosts = release_roles(:all)
     Parallel.each(hosts, in_threads: config.max_parallels(hosts)) do |host|
       execute "rsync -az -e ssh #{config.local_release_path}/public/ #{host}:#{fetch(:deploy_to)}/shared/public"
@@ -207,12 +208,12 @@ before "bundle_rsync:rsync_release", "precompile"
 
 `bundle_rsync` supports `local_git` SCM strategy in addition to `git`.
 
-`local_git` strategy enables to rsync the git repository located on a local path without git clone. You may find as this is useful when you need to replace files locally without commit beforehand (for example, for password embedding). 
+`local_git` strategy enables to rsync the git repository located on a local path without git clone. You may find as this is useful when you need to replace files locally without commit beforehand (for example, for password embedding).
 
 Following is an example of `config/deploy/xxxx.rb`:
 
-Please note that `repo_url` should be a different path with the path running cap. 
-This strategy probably fits with a rare situation, you should use the default `git` strategy usually. 
+Please note that `repo_url` should be a different path with the path running cap.
+This strategy probably fits with a rare situation, you should use the default `git` strategy usually.
 
 ```ruby
 set :branch, ENV['BRANCH'] || 'master'
@@ -236,11 +237,11 @@ role :app, ['127.0.0.1']
 
 Q. What is difference with [capistrano-rsync](https://github.com/moll/capistrano-rsync)?
 
-A. capistrano-bundle\_rsync does `bundle install` at the deploy machine, not on each remote machine. 
+A. capistrano-bundle\_rsync does `bundle install` at the deploy machine, not on each remote machine.
 
 ## ToDo
 
-1. Support other SCMs than `git`. 
+1. Support other SCMs than `git`.
 
 ## ChangeLog
 

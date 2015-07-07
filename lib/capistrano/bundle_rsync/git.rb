@@ -11,7 +11,11 @@ class Capistrano::BundleRsync::Git < Capistrano::BundleRsync::SCM
     if File.exist?(config.local_mirror_path)
       info t(:mirror_exists, at: config.local_mirror_path)
     else
-      execute :git, :clone, '--recursive', repo_url, config.local_mirror_path
+      if depth = fetch(:git_clone_depth)
+        execute :git, :clone, '--recursive', '--depth', depth, repo_url, config.local_mirror_path
+      else
+        execute :git, :clone, '--recursive', repo_url, config.local_mirror_path
+      end
     end
   end
 

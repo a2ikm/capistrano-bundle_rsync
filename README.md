@@ -47,7 +47,8 @@ Name          | Default | Description
 --------------|---------|------------
 repo_url      | `.` | The path or URL to a Git repository to clone from.  
 repo_tree      | nil | Specify the subtree path of the repository to deploy.
-branch        | `master` | The Git branch to checkout.  
+strip_repo_tree | false   | Strip  repo_tree's head directory or not.
+branch        | `master` | The Git branch to checkout.
 ssh_options   | `{}`  | Configuration of ssh :user and :keys.
 keep\_releases | 5 | The number of releases to keep.
 scm | nil | Must be `bundle_rsync` to use capistrano-bundle_rsync.
